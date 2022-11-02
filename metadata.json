@@ -1,0 +1,12 @@
+{
+	"shell-version":
+	[
+		"42"
+	],
+	"version": 1,
+	"uuid": "kimai@benediktmagnus.de",
+	"description": "A Gnome Shell integration for the Kimai time tracking app.",
+	"name": "Kimai",
+	"author": "BenediktMagnus",
+	"url": "https://github.com/BenediktMagnus/kimai-gnome-shell-extension"
+}
