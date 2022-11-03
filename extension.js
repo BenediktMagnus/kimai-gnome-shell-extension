@@ -3,7 +3,6 @@
 'use strict';
 
 // External imports:
-const Clutter = imports.gi.Clutter;
 const ExtensionUtils = imports.misc.extensionUtils;
 const Gio = imports.gi.Gio;
 const Main = imports.ui.main;
@@ -14,10 +13,9 @@ const St = imports.gi.St;
 const ThisExtension = ExtensionUtils.getCurrentExtension();
 /** @type {import('./utility/constants')} */
 const Constants = ThisExtension.imports.utility.constants;
+/** @type {import('./kimai/api')} */
+const KimaiApi = ThisExtension.imports.kimai.api;
 const Timer = ThisExtension.imports.utility.timer;
-
-// Constants:
-const refreshIntervalMilliseconds = 60 * 1000;
 
 class Extension
 {
@@ -26,10 +24,14 @@ class Extension
     _icon;
 
     // Components:
+    /** @type {import('./kimai/api').Api|null} */
+    _api;
     _timer;
+    _settings;
 
     // State:
     _running;
+    _updateIntervalMilliseconds;
 
     // Constant objects:
     _kimaiIconEnabled;
@@ -40,9 +42,12 @@ class Extension
         this._indicator = null;
         this._icon = null;
 
+        this._api = null;
         this._timer = null;
+        this._settings = null;
 
         this._running = false;
+        this._updateIntervalMilliseconds = 5 * 1000;
 
         this._kimaiIconEnabled = Gio.icon_new_for_string(`${ThisExtension.path}/images/kimai-icon-enabled.png`);
         this._kimaiIconDisabled = Gio.icon_new_for_string(`${ThisExtension.path}/images/kimai-icon-disabled.png`);
@@ -52,10 +57,16 @@ class Extension
     {
         if (!this._running)
         {
+            this._settings = ExtensionUtils.getSettings(Constants.SettingsSchema);
+
+            this._updateSettings();
             this._createIndicator();
+            this._createApi();
             this._startTimer();
 
             this._running = true;
+
+            this._updateStatus();
         }
     }
 
@@ -63,10 +74,12 @@ class Extension
     {
         this._running = false;
 
-        if (this.timer !== null)
+        this._stopTimer();
+
+        if (this._api !== null)
         {
-            Timer.clearInterval(this.timer);
-            this.timeout = null;
+            this._api.close();
+            this._api = null;
         }
 
         if (this._indicator !== null)
@@ -75,6 +88,7 @@ class Extension
             this._indicator = null;
         }
 
+        this._settings = null;
         this._icon = null;
     }
 
@@ -101,15 +115,79 @@ class Extension
         Main.panel.addToStatusArea(indicatorName, this._indicator);
     }
 
+    _createApi ()
+    {
+        const baseUrl = this._settings.get_string(Constants.SettingKeyBaseUrl);
+        const username = this._settings.get_string(Constants.SettingKeyUsername);
+        const token = this._settings.get_string(Constants.SettingKeyToken);
+
+        this._api = new KimaiApi.Api(baseUrl, username, token);
+    }
+
     _startTimer ()
     {
-        this._timer = Timer.setInterval(this._onTimerInterval.bind(this), refreshIntervalMilliseconds);
+        this._timer = Timer.setInterval(this._onTimerInterval.bind(this), this._updateIntervalMilliseconds);
+    }
+
+    _stopTimer()
+    {
+        if (this._timer !== null)
+        {
+            Timer.clearInterval(this._timer);
+            this._timer = null;
+        }
     }
 
     _onTimerInterval ()
     {
-        // Hole Status von der API
-        // Setze Icon entsprechend: this._icon.set_gicon(this._kimaiIconEnabled);
+        const previousInterval = this._updateIntervalMilliseconds;
+
+        this._updateSettings();
+        this._updateStatus();
+
+        if (previousInterval !== this._updateIntervalMilliseconds)
+        {
+            this._stopTimer();
+            this._startTimer();
+        }
+    }
+
+    _updateSettings ()
+    {
+        if (this._api !== null)
+        {
+            const baseUrl = this._settings.get_string(Constants.SettingKeyBaseUrl);
+            const username = this._settings.get_string(Constants.SettingKeyUsername);
+            const token = this._settings.get_string(Constants.SettingKeyToken);
+
+            this._log(baseUrl);
+            this._log(username);
+            this._log(token);
+
+            this._api.setBaseUrl(baseUrl);
+            this._api.setAuthentification(username, token);
+        }
+
+        this._updateIntervalMilliseconds = this._settings.get_int(Constants.SettingKeyUpdateInterval) * 1000;
+
+        this._log(this._updateIntervalMilliseconds);
+    }
+
+    _updateStatus ()
+    {
+        this._api?.getFirstActiveTimesheet(
+            (timesheet) =>
+            {
+                if (timesheet === null)
+                {
+                    this._icon.set_gicon(this._kimaiIconDisabled);
+                }
+                else
+                {
+                    this._icon.set_gicon(this._kimaiIconEnabled);
+                }
+            }
+        );
     }
 
     _log (message)
@@ -122,3 +200,7 @@ function init ()
 {
     return new Extension();
 }
+
+// HACK: Allow referencing this module in JSDoc by deluding it into thinking this was a module:
+var module = {};
+module.exports = { init };
