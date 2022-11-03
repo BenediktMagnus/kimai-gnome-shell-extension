@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+    <schema id="org.gnome.shell.extensions.kimai" path="/org/gnome/shell/extensions/kimai/">
+        <key name="username" type="s">
+            <default>''</default>
+            <summary>Kimai Username</summary>
+        </key>
+        <key name="token" type="s">
+            <default>''</default>
+            <summary>Kimai API Password</summary>
+        </key>
+        <key name="baseurl" type="s">
+            <default>'https://demo.kimai.org'</default>
+            <summary>Kimai Base URL</summary>
+        </key>
+        <key name="updateinterval" type="i">
+            <default>60</default>
+            <summary>Update Interval in Seconds</summary>
+        </key>
+    </schema>
+</schemalist>
