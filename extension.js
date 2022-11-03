@@ -12,6 +12,8 @@ const St = imports.gi.St;
 
 // Internal imports:
 const ThisExtension = ExtensionUtils.getCurrentExtension();
+/** @type {import('./utility/constants')} */
+const Constants = ThisExtension.imports.utility.constants;
 const Timer = ThisExtension.imports.utility.timer;
 
 // Constants:
