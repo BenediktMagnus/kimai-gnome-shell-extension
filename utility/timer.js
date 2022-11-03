@@ -1,3 +1,5 @@
+'use strict';
+
 const Mainloop = imports.mainloop;
 
 var setTimeout = function (func, millis /* , ... args */)

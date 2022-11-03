@@ -1,5 +1,7 @@
 #!/usr/bin/env gjs
 
+'use strict';
+
 // External imports:
 const Clutter = imports.gi.Clutter;
 const ExtensionUtils = imports.misc.extensionUtils;
