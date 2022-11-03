@@ -1,3 +1,5 @@
+'use strict';
+
 const ByteArray = imports.byteArray;
 const GLib = imports.gi.GLib;
 const Soup = imports.gi.Soup;
@@ -6,10 +8,14 @@ const Soup = imports.gi.Soup;
 
 var Api = class Api
 {
+    /** @type {string} */
     _baseUrl;
+    /** @type {string} */
     _username;
+    /** @type {string} */
     _token;
 
+    /** @type {Soup.Session} */
     _session;
 
     /**
@@ -21,21 +27,39 @@ var Api = class Api
     {
         this._session = new Soup.Session();
 
-        this._baseUrl = baseUrl;
-        this._username = username;
-        this._token = token;
-        this._userId = null;
-
-        if (!this._baseUrl.endsWith('/'))
-        {
-            this._baseUrl += '/';
-        }
-        this._baseUrl += 'api';
+        this.setBaseUrl(baseUrl);
+        this.setAuthentification(username, token);
     }
 
     close ()
     {
         this._session.abort();
+    }
+
+    /**
+     * @param {string} baseUrl
+     */
+    setBaseUrl (baseUrl)
+    {
+        let newBaseUrl = baseUrl;
+
+        if (!newBaseUrl.endsWith('/'))
+        {
+            newBaseUrl += '/';
+        }
+        newBaseUrl += 'api';
+
+        this._baseUrl = newBaseUrl;
+    }
+
+    /**
+     * @param {string} username
+     * @param {string} token
+     */
+    setAuthentification (username, token)
+    {
+        this._username = username;
+        this._token = token;
     }
 
     /**
@@ -62,7 +86,17 @@ var Api = class Api
             null,
             (_, message) =>
             {
-                const rawData = this._session.send_and_read_finish(message).get_data();
+                const response = this._session.send_and_read_finish(message);
+
+                if (response === null)
+                {
+                    /* TODO: Either the server had an error or the settings are incorrect. This should be shown to the user.
+                             The icon could become red in this case, but we needed to propagate the error upwards as not the API but the
+                             extension should handle that. */
+                    return;
+                }
+
+                const rawData = response.get_data()
                 const dataString = ByteArray.toString(rawData);
                 const data = JSON.parse(dataString);
                 callback(data)
