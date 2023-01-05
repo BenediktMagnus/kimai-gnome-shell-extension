@@ -160,17 +160,11 @@ class Extension
             const username = this._settings.get_string(Constants.SettingKeyUsername);
             const token = this._settings.get_string(Constants.SettingKeyToken);
 
-            this._log(baseUrl);
-            this._log(username);
-            this._log(token);
-
             this._api.setBaseUrl(baseUrl);
             this._api.setAuthentification(username, token);
         }
 
         this._updateIntervalMilliseconds = this._settings.get_int(Constants.SettingKeyUpdateInterval) * 1000;
-
-        this._log(this._updateIntervalMilliseconds);
     }
 
     _updateStatus ()
