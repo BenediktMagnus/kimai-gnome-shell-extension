@@ -82,6 +82,8 @@ class Extension
             this._api = null;
         }
 
+        this._icon = null;
+
         if (this._indicator !== null)
         {
             this._indicator.destroy();
@@ -89,7 +91,6 @@ class Extension
         }
 
         this._settings = null;
-        this._icon = null;
     }
 
     _createIndicator ()
