@@ -2,7 +2,7 @@
 
 const Mainloop = imports.mainloop;
 
-var setTimeout = function (func, millis /* , ... args */)
+export function setTimeout (func, millis /* , ... args */)
 {
     let args = [];
     if (arguments.length > 2)
@@ -21,14 +21,14 @@ var setTimeout = function (func, millis /* , ... args */)
     );
 
     return id;
-};
+}
 
-var clearTimeout = function (id)
+export function clearTimeout (id)
 {
     Mainloop.source_remove(id);
-};
+}
 
-var setInterval = function (func, millis /* , ... args */)
+export function setInterval (func, millis /* , ... args */)
 {
     let args = [];
     if (arguments.length > 2)
@@ -46,9 +46,9 @@ var setInterval = function (func, millis /* , ... args */)
     );
 
     return id;
-};
+}
 
-var clearInterval = function (id)
+export function clearInterval (id)
 {
     Mainloop.source_remove(id);
-};
+}

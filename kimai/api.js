@@ -1,12 +1,12 @@
 'use strict';
 
 const ByteArray = imports.byteArray;
-const GLib = imports.gi.GLib;
-const Soup = imports.gi.Soup;
+import GLib from 'gi://GLib';
+import Soup from 'gi://Soup';
 
 /** @typedef {import('./definitions/timesheet').Timesheet} Timesheet */
 
-var Api = class Api
+export class Api
 {
     /** @type {string} */
     _baseUrl;
@@ -167,7 +167,3 @@ var Api = class Api
         );
     }
 }
-
-// HACK: Allow referencing this module in JSDoc by deluding it into thinking this was a module:
-var module = {};
-module.exports = { Api };

@@ -1,9 +1,9 @@
 {
 	"shell-version":
 	[
-		"42"
+		"46"
 	],
-	"version": 1,
+	"version": 2,
 	"uuid": "kimai@benediktmagnus.de",
 	"description": "A Gnome Shell integration for the Kimai time tracking app.",
 	"name": "Kimai",

@@ -3,21 +3,21 @@
 'use strict';
 
 // External imports:
-const ExtensionUtils = imports.misc.extensionUtils;
-const Gio = imports.gi.Gio;
-const Main = imports.ui.main;
-const PanelMenu = imports.ui.panelMenu;
-const St = imports.gi.St;
+import * as ExtensionUtils from 'resource:///org/gnome/shell/misc/extensionUtils.js';
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
+import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
+import Gio from 'gi://Gio';
+import St from 'gi://St';
 
 // Internal imports:
-const ThisExtension = ExtensionUtils.getCurrentExtension();
 /** @type {import('./utility/constants')} */
-const Constants = ThisExtension.imports.utility.constants;
+import * as Constants from './utility/constants.js';
 /** @type {import('./kimai/api')} */
-const KimaiApi = ThisExtension.imports.kimai.api;
-const Timer = ThisExtension.imports.utility.timer;
+import * as KimaiApi from './kimai/api.js';
+import * as Timer from './utility/timer.js';
 
-class Extension
+export default class KimaiExtension extends Extension
 {
     // UI elements:
     _indicator;
@@ -37,8 +37,10 @@ class Extension
     _kimaiIconEnabled;
     _kimaiIconDisabled;
 
-    constructor ()
+    constructor (metadata)
     {
+        super(metadata);
+
         this._indicator = null;
         this._icon = null;
 
@@ -49,15 +51,15 @@ class Extension
         this._running = false;
         this._updateIntervalMilliseconds = 5 * 1000;
 
-        this._kimaiIconEnabled = Gio.icon_new_for_string(`${ThisExtension.path}/images/kimai-icon-enabled.png`);
-        this._kimaiIconDisabled = Gio.icon_new_for_string(`${ThisExtension.path}/images/kimai-icon-disabled.png`);
+        this._kimaiIconEnabled = Gio.Icon.new_for_string(`${this.path}/images/kimai-icon-enabled.png`);
+        this._kimaiIconDisabled = Gio.Icon.new_for_string(`${this.path}/images/kimai-icon-disabled.png`);
     }
 
     enable ()
     {
         if (!this._running)
         {
-            this._settings = ExtensionUtils.getSettings(Constants.SettingsSchema);
+            this._settings = this.getSettings(Constants.SettingsSchema);
 
             this._updateSettings();
             this._createIndicator();
@@ -95,7 +97,7 @@ class Extension
 
     _createIndicator ()
     {
-        const indicatorName = `${ThisExtension.metadata.name} Indicator`;
+        const indicatorName = `${this.metadata.name} Indicator`;
         this._indicator = new PanelMenu.Button(0.0, indicatorName, false);
 
         const boxLayout = new St.BoxLayout(
@@ -187,15 +189,6 @@ class Extension
 
     _log (message)
     {
-        log(`${ThisExtension.metadata.name} - ${message}`);
+        log(`${this.metadata.name} - ${message}`);
     }
 }
-
-function init ()
-{
-    return new Extension();
-}
-
-// HACK: Allow referencing this module in JSDoc by deluding it into thinking this was a module:
-var module = {};
-module.exports = { init };
