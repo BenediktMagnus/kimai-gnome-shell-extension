@@ -1,5 +1,7 @@
 'use strict';
 
+/// <reference path="../ambient.d.ts" />
+
 const ByteArray = imports.byteArray;
 import GLib from 'gi://GLib';
 import Soup from 'gi://Soup';
@@ -87,8 +89,9 @@ export class Api
             (_, message) =>
             {
                 const response = this._session.send_and_read_finish(message);
+                const rawData = response.get_data();
 
-                if (response === null)
+                if (rawData === null)
                 {
                     /* TODO: Either the server had an error or the settings are incorrect. This should be shown to the user.
                              The icon could become red in this case, but we needed to propagate the error upwards as not the API but the
@@ -96,7 +99,6 @@ export class Api
                     return;
                 }
 
-                const rawData = response.get_data()
                 const dataString = ByteArray.toString(rawData);
                 const data = JSON.parse(dataString);
                 callback(data)

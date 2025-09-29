@@ -1,22 +1,18 @@
 'use strict';
 
-// External imports:
-import * as Adw from 'gi://Adw';
-import * as ExtensionUtils from 'resource:///org/gnome/shell/misc/extensionUtils.js';
-import * as Gio from 'gi://Gio';
-import * as Gtk from 'gi://Gtk';
-import { ExtensionPreferences } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
+/// <reference path="./ambient.d.ts" />
 
-// Internal imports:
-const ThisExtension = ExtensionUtils.getCurrentExtension();
-/** @type {import('./utility/constants')} */
-const Constants = ThisExtension.imports.utility.constants;
+import Adw from 'gi://Adw';
+import Gio from 'gi://Gio';
+import Gtk from 'gi://Gtk';
+import { ExtensionPreferences } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
+import * as Constants from './utility/constants.js';
 
 export default class KimaiExtensionPreferences extends ExtensionPreferences
 {
-    fillPreferencesWindow (window)
+    async fillPreferencesWindow (window)
     {
-        const settings = ExtensionUtils.getSettings(Constants.SettingsSchema);
+        const settings = this.getSettings(Constants.SettingsSchema);
 
         const page = new Adw.PreferencesPage();
         const group = new Adw.PreferencesGroup();

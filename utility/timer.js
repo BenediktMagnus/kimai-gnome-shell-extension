@@ -17,7 +17,7 @@ export function setTimeout (func, millis /* , ... args */)
             func.apply(null, args);
             return false; // Stop repeating
         },
-        null
+        undefined
     );
 
     return id;
@@ -42,7 +42,7 @@ export function setInterval (func, millis /* , ... args */)
             func.apply(null, args);
             return true; // Repeat
         },
-        null
+        undefined
     );
 
     return id;
