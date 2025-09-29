@@ -107,6 +107,7 @@ export default class KimaiExtension extends Extension
             }
         );
         this._indicator.add_child(boxLayout);
+        this._indicator.connect('button-press-event', this._onIndicatorClicked.bind(this));
 
         this._icon = new St.Icon(
             {
@@ -117,6 +118,16 @@ export default class KimaiExtension extends Extension
         boxLayout.add_child(this._icon);
 
         Main.panel.addToStatusArea(indicatorName, this._indicator);
+    }
+
+    _onIndicatorClicked ()
+    {
+        const baseUrl = this._settings.get_string(Constants.SettingKeyBaseUrl);
+
+        if (baseUrl != undefined && baseUrl !== '')
+        {
+            Gio.AppInfo.launch_default_for_uri(baseUrl, null);
+        }
     }
 
     _createApi ()
